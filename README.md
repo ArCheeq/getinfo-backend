@@ -32,6 +32,20 @@
 $ npm install
 ```
 
+## Docker
+
+```bash
+# generate prisma client
+$ docker compose up -d
+```
+
+## Prisma
+
+```bash
+# prisma migrate
+$ npx prisma migrate dev
+```
+
 ## Running the app
 
 ```bash
@@ -43,6 +57,13 @@ $ npm run start:dev
 
 # production mode
 $ npm run start:prod
+```
+
+## Generate seeds data (only during the first installation of the project)
+
+```bash
+# generate seed
+$ npm run seed
 ```
 
 ## Test
