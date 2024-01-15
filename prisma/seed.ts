@@ -17,7 +17,6 @@ async function main() {
       roleId: 1,
     },
   });
-  console.log({ roles, admin });
 }
 main()
   .then(async () => {

@@ -6,7 +6,6 @@ import {
   CreateUserDto,
 } from './dto/user.dto';
 import { hash } from 'bcrypt';
-import { prismaExclude } from 'src/utils/exclude';
 
 @Injectable()
 export class UserService {
@@ -112,9 +111,6 @@ export class UserService {
       where: { id },
       include: { studentInfo: true, teacherInfo: true, role: true },
     });
-
-    console.log('ID: ', id);
-    console.log('USER: ', user);
     return user;
   }
 }
