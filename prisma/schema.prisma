@@ -1,0 +1,133 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+// Enums
+
+enum Roles {
+    ROLE_STUDENT
+    ROLE_TEACHER
+    ROLE_ADMIN
+}
+
+enum Statuses {
+    Submitted
+    Processing
+    Clarify
+    Clarified
+    Processed
+    Canceled
+}
+
+// Models
+
+model User {
+    id        Int    @id @default(autoincrement())
+    email     String @unique
+    password  String
+    firstname String
+    lastname  String
+
+    roleId Int
+    role   Role @relation(fields: [roleId], references: [id])
+
+    studentInfo Student?
+    teacherInfo Teacher?
+}
+
+model Role {
+    id    Int    @id @default(autoincrement())
+    name  Roles  @default(ROLE_STUDENT)
+    label String
+    users User[]
+}
+
+model Student {
+    id     Int    @id @default(autoincrement())
+    group  String
+    userId Int    @unique
+    user   User   @relation(fields: [userId], references: [id])
+}
+
+model Teacher {
+    id             Int     @id @default(autoincrement())
+    academicStatus String  @map("academic_status")
+    isVerified     Boolean @default(false) @map("is_verified")
+    userId         Int     @unique
+    user           User    @relation(fields: [userId], references: [id])
+}
+
+model Request {
+    id            Int         @id @default(autoincrement())
+    name          String
+    surname       String
+    email         String
+    userId        String      @map("user_id")
+    text          String?
+    status        Statuses    @default(Submitted)
+    files         File[]
+    categoryId    Int         @map("category_id")
+    category      Category    @relation(fields: [categoryId], references: [id])
+    subcategoryId Int         @map("subcategory_id")
+    subcategory   Subcategory @relation(fields: [subcategoryId], references: [id])
+    createdAt     DateTime    @default(now()) @map("created_at")
+    updatedAt     DateTime    @updatedAt @map("updated_at")
+    Message       Message[]
+}
+
+model Category {
+    id            Int           @id @default(autoincrement())
+    name          String
+    description   String
+    userId        String        @map("user_id")
+    color         String
+    requests      Request[]
+    subcategories Subcategory[]
+    createdAt     DateTime      @default(now()) @map("created_at")
+    updatedAt     DateTime      @updatedAt @map("updated_at")
+}
+
+model Subcategory {
+    id             Int       @id @default(autoincrement())
+    name           String
+    description    String
+    fileId         Int?      @map("file_id")
+    example        File?     @relation(fields: [fileId], references: [id])
+    additionalInfo String?   @map("additional_info")
+    downloadFile   Boolean   @map("download_file")
+    textField      Boolean   @map("text_field")
+    requests       Request[]
+    categoryId     Int       @map("category_id")
+    category       Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+    createdAt      DateTime  @default(now()) @map("created_at")
+    updatedAt      DateTime  @updatedAt @map("updated_at")
+}
+
+model Message {
+    id        Int      @id @default(autoincrement())
+    requestId Int      @map("request_id")
+    request   Request  @relation(fields: [requestId], references: [id])
+    userId    Int      @map("user_id")
+    text      String?
+    files     File[]
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model File {
+    id          Int           @id @default(autoincrement())
+    fileUrl     String        @map("file_url")
+    ownerId     String        @map("owner_id")
+    createdAt   DateTime      @default(now()) @map("created_at")
+    updatedAt   DateTime      @updatedAt @map("updated_at")
+    Request     Request?      @relation(fields: [requestId], references: [id])
+    requestId   Int?          @map("request_id")
+    subcategory Subcategory[]
+    Message     Message?      @relation(fields: [messageId], references: [id])
+    messageId   Int?          @map("message_id")
+}
